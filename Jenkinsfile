@@ -11,5 +11,21 @@ pipeline {
                 sh 'mvn clean deploy'
             }
         }
+        stage("test") {
+            echo "---------------unit test started-------------"
+            sh 'mvn surefire-report:report'
+            echo "--------------unit test completed------------"
+        }
+        stage("sonarQube analysis") {
+            environment {
+                scannerHome = tool 'sonar-scanner'
+            }
+
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
     }
 }
